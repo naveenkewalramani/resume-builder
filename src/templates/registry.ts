@@ -1,5 +1,7 @@
 import { BuiltInTemplate } from './types';
 import { ClassicTemplate } from './classic';
+import { ModernTemplate } from './modern';
+import { MinimalTemplate } from './minimal';
 
 export const builtInTemplates: BuiltInTemplate[] = [
   {
@@ -7,6 +9,18 @@ export const builtInTemplates: BuiltInTemplate[] = [
     name: 'Classic',
     description: 'Clean, single-column layout. ATS-friendly.',
     component: ClassicTemplate,
+  },
+  {
+    id: 'modern',
+    name: 'Modern',
+    description: 'Two-column with accent sidebar.',
+    component: ModernTemplate,
+  },
+  {
+    id: 'minimal',
+    name: 'Minimal',
+    description: 'Whitespace-heavy, elegant.',
+    component: MinimalTemplate,
   },
 ];
 

@@ -1,13 +1,83 @@
 'use client';
 
+import { useState } from 'react';
 import { useResumeStore } from '@/store/resumeStore';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { BulletEditor } from './BulletEditor';
-import { Trash2, Plus } from 'lucide-react';
+import { Trash2, Plus, Sparkles, Loader2 } from 'lucide-react';
 import { WorkExperience } from '@/types/resume';
+import { getApiKey, suggestBullets } from '@/lib/ai';
+import { SettingsModal } from '@/components/SettingsModal';
+
+// ---------------------------------------------------------------------------
+// Per-entry suggest button (needs its own state)
+// ---------------------------------------------------------------------------
+
+interface SuggestBulletsButtonProps {
+  entry: WorkExperience;
+  onAdd: (bullets: string[]) => void;
+}
+
+function SuggestBulletsButton({ entry, onAdd }: SuggestBulletsButtonProps) {
+  const [suggesting, setSuggesting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+
+  const handleSuggest = async () => {
+    const apiKey = getApiKey();
+    if (!apiKey) {
+      setSettingsOpen(true);
+      return;
+    }
+
+    setSuggesting(true);
+    setError(null);
+
+    try {
+      const newBullets = await suggestBullets(apiKey, {
+        title: entry.title,
+        company: entry.company,
+        existingBullets: entry.bullets,
+      });
+      onAdd(newBullets);
+    } catch (e) {
+      console.error('AI suggestion failed:', e);
+      setError('Suggestion failed. Check your API key.');
+    } finally {
+      setSuggesting(false);
+    }
+  };
+
+  return (
+    <>
+      <div className="mt-1">
+        <button
+          onClick={handleSuggest}
+          disabled={suggesting}
+          className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
+        >
+          {suggesting ? (
+            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+          ) : (
+            <Sparkles className="h-3.5 w-3.5" />
+          )}
+          {suggesting ? 'Suggesting...' : 'Suggest bullets'}
+        </button>
+        {error && (
+          <p className="text-xs text-destructive mt-0.5">{error}</p>
+        )}
+      </div>
+      <SettingsModal open={settingsOpen} onOpenChange={setSettingsOpen} />
+    </>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// ExperienceForm
+// ---------------------------------------------------------------------------
 
 export function ExperienceForm() {
   const { resume, addExperience, updateExperience, removeExperience } = useResumeStore();
@@ -92,6 +162,12 @@ export function ExperienceForm() {
             <BulletEditor
               bullets={exp.bullets}
               onChange={(bullets) => updateExperience(exp.id, { bullets })}
+            />
+            <SuggestBulletsButton
+              entry={exp}
+              onAdd={(newBullets) =>
+                updateExperience(exp.id, { bullets: [...exp.bullets, ...newBullets] })
+              }
             />
           </div>
         </div>

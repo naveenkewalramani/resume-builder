@@ -4,7 +4,9 @@ import { useRef, useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { useResumeStore } from '@/store/resumeStore';
 import { exportResume, importResume } from '@/lib/fileIO';
-import { Save, Upload, FileText, ChevronDown, Pencil, Copy, Trash2, Plus } from 'lucide-react';
+import { Save, Upload, FileText, ChevronDown, Pencil, Copy, Trash2, Plus, Settings2 } from 'lucide-react';
+import { SettingsModal } from '@/components/SettingsModal';
+import { AtsScoreModal } from '@/components/AtsScoreModal';
 import {
   Dialog,
   DialogContent,
@@ -203,6 +205,8 @@ export function Toolbar() {
   const { resume, loadResume } = useResumeStore();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [atsOpen, setAtsOpen] = useState(false);
 
   const handleImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -271,7 +275,28 @@ export function Toolbar() {
           className="hidden"
           onChange={handleImport}
         />
+
+        <Button
+          variant="ghost"
+          size="sm"
+          className="text-xs"
+          onClick={() => setAtsOpen(true)}
+        >
+          ATS Score
+        </Button>
+
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-8 w-8"
+          onClick={() => setSettingsOpen(true)}
+        >
+          <Settings2 className="h-4 w-4" />
+        </Button>
       </div>
+
+      <SettingsModal open={settingsOpen} onOpenChange={setSettingsOpen} />
+      <AtsScoreModal open={atsOpen} onOpenChange={setAtsOpen} />
     </header>
   );
 }

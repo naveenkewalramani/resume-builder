@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { useResumeStore } from '@/store/resumeStore';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -7,9 +8,14 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { BulletEditor } from './BulletEditor';
-import { Trash2, Plus, X } from 'lucide-react';
+import { Trash2, Plus, X, Sparkles, Loader2 } from 'lucide-react';
 import { Project } from '@/types/resume';
-import { useState } from 'react';
+import { getApiKey, suggestBullets } from '@/lib/ai';
+import { SettingsModal } from '@/components/SettingsModal';
+
+// ---------------------------------------------------------------------------
+// Tech tag editor
+// ---------------------------------------------------------------------------
 
 function TechTagEditor({
   technologies,
@@ -56,6 +62,73 @@ function TechTagEditor({
     </div>
   );
 }
+
+// ---------------------------------------------------------------------------
+// Per-project suggest button
+// ---------------------------------------------------------------------------
+
+interface SuggestBulletsButtonProps {
+  project: Project;
+  onAdd: (bullets: string[]) => void;
+}
+
+function SuggestBulletsButton({ project, onAdd }: SuggestBulletsButtonProps) {
+  const [suggesting, setSuggesting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+
+  const handleSuggest = async () => {
+    const apiKey = getApiKey();
+    if (!apiKey) {
+      setSettingsOpen(true);
+      return;
+    }
+
+    setSuggesting(true);
+    setError(null);
+
+    try {
+      const newBullets = await suggestBullets(apiKey, {
+        title: project.name,
+        company: '',
+        existingBullets: project.bullets,
+      });
+      onAdd(newBullets);
+    } catch (e) {
+      console.error('AI suggestion failed:', e);
+      setError('Suggestion failed. Check your API key.');
+    } finally {
+      setSuggesting(false);
+    }
+  };
+
+  return (
+    <>
+      <div className="mt-1">
+        <button
+          onClick={handleSuggest}
+          disabled={suggesting}
+          className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
+        >
+          {suggesting ? (
+            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+          ) : (
+            <Sparkles className="h-3.5 w-3.5" />
+          )}
+          {suggesting ? 'Suggesting...' : 'Suggest bullets'}
+        </button>
+        {error && (
+          <p className="text-xs text-destructive mt-0.5">{error}</p>
+        )}
+      </div>
+      <SettingsModal open={settingsOpen} onOpenChange={setSettingsOpen} />
+    </>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// ProjectsForm
+// ---------------------------------------------------------------------------
 
 export function ProjectsForm() {
   const { resume, addProject, updateProject, removeProject } = useResumeStore();
@@ -117,6 +190,12 @@ export function ProjectsForm() {
             <BulletEditor
               bullets={proj.bullets}
               onChange={(bullets) => updateProject(proj.id, { bullets })}
+            />
+            <SuggestBulletsButton
+              project={proj}
+              onAdd={(newBullets) =>
+                updateProject(proj.id, { bullets: [...proj.bullets, ...newBullets] })
+              }
             />
           </div>
         </div>
