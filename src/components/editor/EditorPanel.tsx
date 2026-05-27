@@ -4,7 +4,109 @@ import { useState } from 'react';
 import { DndContext, closestCenter, DragEndEvent, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { SortableContext, useSortable, verticalListSortingStrategy, arrayMove } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { GripVertical, Upload } from 'lucide-react';
+import { GripVertical } from 'lucide-react';
+
+// ---------------------------------------------------------------------------
+// Template thumbnail SVGs — abstract layout sketches, accent-color-aware
+// ---------------------------------------------------------------------------
+
+function ClassicThumb({ accent }: { accent: string }) {
+  return (
+    <svg viewBox="0 0 80 54" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
+      <rect width="80" height="54" fill="#f8f8f8" rx="2"/>
+      {/* header strip */}
+      <rect x="0" y="0" width="80" height="12" fill={accent} rx="2"/>
+      <rect x="0" y="10" width="80" height="2" fill={accent}/>
+      {/* name line */}
+      <rect x="8" y="3" width="30" height="3" fill="white" rx="1"/>
+      <rect x="8" y="7.5" width="44" height="1.5" fill="white" opacity="0.7" rx="0.5"/>
+      {/* section header */}
+      <rect x="8" y="17" width="18" height="2" fill={accent} rx="0.5"/>
+      <rect x="8" y="20.5" width="64" height="0.5" fill={accent} opacity="0.4"/>
+      {/* content lines */}
+      <rect x="8" y="23" width="55" height="1.5" fill="#ccc" rx="0.5"/>
+      <rect x="8" y="26" width="48" height="1.5" fill="#ddd" rx="0.5"/>
+      <rect x="8" y="29" width="52" height="1.5" fill="#ddd" rx="0.5"/>
+      {/* section header 2 */}
+      <rect x="8" y="34" width="22" height="2" fill={accent} rx="0.5"/>
+      <rect x="8" y="37.5" width="64" height="0.5" fill={accent} opacity="0.4"/>
+      <rect x="8" y="40" width="50" height="1.5" fill="#ccc" rx="0.5"/>
+      <rect x="8" y="43" width="44" height="1.5" fill="#ddd" rx="0.5"/>
+      <rect x="8" y="46" width="47" height="1.5" fill="#ddd" rx="0.5"/>
+    </svg>
+  );
+}
+
+function ModernThumb({ accent }: { accent: string }) {
+  return (
+    <svg viewBox="0 0 80 54" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
+      <rect width="80" height="54" fill="#f8f8f8" rx="2"/>
+      {/* left accent column */}
+      <rect x="0" y="0" width="24" height="54" fill={accent} rx="2"/>
+      <rect x="22" y="0" width="2" height="54" fill={accent}/>
+      {/* left col: name + contact */}
+      <rect x="3" y="5" width="16" height="2.5" fill="white" rx="0.5"/>
+      <rect x="3" y="9" width="12" height="1.5" fill="white" opacity="0.6" rx="0.5"/>
+      <rect x="3" y="12" width="14" height="1.5" fill="white" opacity="0.6" rx="0.5"/>
+      {/* left col: skills header */}
+      <rect x="3" y="18" width="10" height="1.5" fill="white" opacity="0.8" rx="0.5"/>
+      <rect x="3" y="21" width="16" height="1" fill="white" opacity="0.5" rx="0.5"/>
+      <rect x="3" y="23.5" width="14" height="1" fill="white" opacity="0.5" rx="0.5"/>
+      <rect x="3" y="26" width="15" height="1" fill="white" opacity="0.5" rx="0.5"/>
+      {/* right col: section header */}
+      <rect x="28" y="7" width="20" height="2" fill={accent} rx="0.5"/>
+      <rect x="28" y="10" width="44" height="0.5" fill={accent} opacity="0.4"/>
+      {/* right col: content */}
+      <rect x="28" y="13" width="40" height="1.5" fill="#ccc" rx="0.5"/>
+      <rect x="28" y="16" width="35" height="1.5" fill="#ddd" rx="0.5"/>
+      <rect x="28" y="19" width="38" height="1.5" fill="#ddd" rx="0.5"/>
+      <rect x="28" y="25" width="22" height="2" fill={accent} rx="0.5"/>
+      <rect x="28" y="28" width="44" height="0.5" fill={accent} opacity="0.4"/>
+      <rect x="28" y="31" width="38" height="1.5" fill="#ccc" rx="0.5"/>
+      <rect x="28" y="34" width="32" height="1.5" fill="#ddd" rx="0.5"/>
+    </svg>
+  );
+}
+
+function MinimalThumb({ accent }: { accent: string }) {
+  return (
+    <svg viewBox="0 0 80 54" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
+      <rect width="80" height="54" fill="#f8f8f8" rx="2"/>
+      {/* centered name */}
+      <rect x="22" y="6" width="36" height="3" fill={accent} rx="1"/>
+      {/* centered contact dots */}
+      <rect x="16" y="11.5" width="48" height="1.5" fill="#bbb" rx="0.5"/>
+      {/* section header — no divider */}
+      <rect x="12" y="20" width="16" height="1.5" fill={accent} rx="0.5"/>
+      {/* accent left-border bullets */}
+      <rect x="12" y="24" width="2" height="4" fill={accent} rx="0.5"/>
+      <rect x="16" y="24.5" width="42" height="1.5" fill="#ccc" rx="0.5"/>
+      <rect x="16" y="27" width="36" height="1.5" fill="#ddd" rx="0.5"/>
+      <rect x="12" y="31" width="2" height="4" fill={accent} rx="0.5"/>
+      <rect x="16" y="31.5" width="38" height="1.5" fill="#ccc" rx="0.5"/>
+      <rect x="16" y="34" width="32" height="1.5" fill="#ddd" rx="0.5"/>
+      {/* section header 2 */}
+      <rect x="12" y="41" width="20" height="1.5" fill={accent} rx="0.5"/>
+      <rect x="12" y="45" width="2" height="4" fill={accent} rx="0.5"/>
+      <rect x="16" y="45.5" width="40" height="1.5" fill="#ccc" rx="0.5"/>
+    </svg>
+  );
+}
+
+function CustomThumb() {
+  return (
+    <svg viewBox="0 0 80 54" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
+      <rect width="80" height="54" fill="#f8f8f8" rx="2"/>
+      <rect x="1" y="1" width="78" height="52" rx="2" stroke="#d1d5db" strokeWidth="1" strokeDasharray="4 2"/>
+      {/* upload arrow */}
+      <path d="M40 30 L40 20 M36 24 L40 20 L44 24" stroke="#9ca3af" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+      {/* base line */}
+      <rect x="34" y="31" width="12" height="1.5" fill="#d1d5db" rx="0.5"/>
+      {/* label */}
+      <rect x="24" y="37" width="32" height="2" fill="#e5e7eb" rx="0.5"/>
+    </svg>
+  );
+}
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { CustomTemplatePanel } from './CustomTemplatePanel';
 import { PersonalForm } from './PersonalForm';
@@ -186,22 +288,43 @@ export function EditorPanel() {
               {/* Template picker */}
               <div className="space-y-1">
                 <p className="text-xs text-muted-foreground">Template</p>
-                <div className="grid grid-cols-2 gap-1">
-                  {(['classic', 'modern', 'minimal', 'custom'] as const).map((t) => (
-                    <button
-                      key={t}
-                      onClick={() => updateMeta({ templateId: t })}
-                      className={cn(
-                        'py-1 rounded text-[10px] font-medium transition-colors border flex items-center justify-center gap-0.5',
-                        resume.meta.templateId === t
-                          ? 'bg-primary text-primary-foreground border-primary'
-                          : 'bg-background text-muted-foreground border-input hover:bg-muted'
-                      )}
-                    >
-                      {t === 'custom' && <Upload className="h-3 w-3" />}
-                      {t.charAt(0).toUpperCase() + t.slice(1)}
-                    </button>
-                  ))}
+                <div className="grid grid-cols-2 gap-1.5">
+                  {([
+                    { id: 'classic', label: 'Classic' },
+                    { id: 'modern', label: 'Modern' },
+                    { id: 'minimal', label: 'Minimal' },
+                    { id: 'custom', label: 'Custom' },
+                  ] as const).map(({ id, label }) => {
+                    const isActive = resume.meta.templateId === id;
+                    return (
+                      <button
+                        key={id}
+                        onClick={() => updateMeta({ templateId: id })}
+                        className={cn(
+                          'flex flex-col rounded-md border overflow-hidden transition-all text-left',
+                          isActive
+                            ? 'border-primary ring-1 ring-primary'
+                            : 'border-input hover:border-muted-foreground/50'
+                        )}
+                        title={label}
+                      >
+                        <div className="h-[42px] w-full bg-white">
+                          {id === 'classic' && <ClassicThumb accent={resume.meta.accentColor} />}
+                          {id === 'modern' && <ModernThumb accent={resume.meta.accentColor} />}
+                          {id === 'minimal' && <MinimalThumb accent={resume.meta.accentColor} />}
+                          {id === 'custom' && <CustomThumb />}
+                        </div>
+                        <div className={cn(
+                          'px-1.5 py-0.5 text-[10px] font-medium text-center w-full',
+                          isActive
+                            ? 'bg-primary text-primary-foreground'
+                            : 'bg-muted/50 text-muted-foreground'
+                        )}>
+                          {label}
+                        </div>
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
               {resume.meta.templateId !== 'custom' && (
