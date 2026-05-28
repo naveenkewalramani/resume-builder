@@ -4,7 +4,7 @@ import { useRef, useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { useResumeStore } from '@/store/resumeStore';
 import { exportResume, importResume } from '@/lib/fileIO';
-import { Save, Upload, FileText, ChevronDown, Pencil, Copy, Trash2, Plus, Settings2 } from 'lucide-react';
+import { Save, Upload, FileText, ChevronDown, Pencil, Copy, Trash2, Plus, Settings2, Link2 } from 'lucide-react';
 import { SettingsModal } from '@/components/SettingsModal';
 import { AtsScoreModal } from '@/components/AtsScoreModal';
 import {
@@ -14,6 +14,12 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 // ---------------------------------------------------------------------------
 // Resume card used inside the manager dialog
@@ -202,11 +208,13 @@ function ResumeManager({ onClose }: ResumeManagerProps) {
 // ---------------------------------------------------------------------------
 
 export function Toolbar() {
-  const { resume, loadResume } = useResumeStore();
+  const { resume, loadResume, createResume } = useResumeStore();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const linkedinInputRef = useRef<HTMLInputElement>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [atsOpen, setAtsOpen] = useState(false);
+  const [linkedinLoading, setLinkedinLoading] = useState(false);
 
   const handleImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -216,6 +224,23 @@ export function Toolbar() {
       loadResume(data);
     } catch {
       alert('Failed to load resume file. Make sure it is a valid .resumejson file.');
+    }
+    e.target.value = '';
+  };
+
+  const handleLinkedInImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setLinkedinLoading(true);
+    try {
+      const { parseLinkedInZip } = await import('@/lib/linkedin');
+      const data = await parseLinkedInZip(file);
+      createResume();
+      loadResume(data);
+    } catch (err) {
+      alert(`Failed to import LinkedIn data: ${err instanceof Error ? err.message : 'Unknown error'}`);
+    } finally {
+      setLinkedinLoading(false);
     }
     e.target.value = '';
   };
@@ -252,14 +277,25 @@ export function Toolbar() {
           </DialogContent>
         </Dialog>
 
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => fileInputRef.current?.click()}
-        >
-          <Upload className="h-3.5 w-3.5 mr-1.5" />
-          Import
-        </Button>
+        {/* Import dropdown */}
+        <DropdownMenu>
+          <DropdownMenuTrigger render={<Button variant="outline" size="sm" />}>
+            <Upload className="h-3.5 w-3.5 mr-1.5" />
+            Import
+            <ChevronDown className="h-3 w-3 ml-1" />
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start">
+            <DropdownMenuItem onSelect={() => fileInputRef.current?.click()}>
+              <Upload className="h-3.5 w-3.5 mr-2" />
+              Resume file (.resumejson)
+            </DropdownMenuItem>
+            <DropdownMenuItem onSelect={() => linkedinInputRef.current?.click()} disabled={linkedinLoading}>
+              <Link2 className="h-3.5 w-3.5 mr-2" />
+              {linkedinLoading ? 'Importing…' : 'LinkedIn data export (.zip)'}
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+
         <Button
           variant="outline"
           size="sm"
@@ -274,6 +310,13 @@ export function Toolbar() {
           accept=".resumejson"
           className="hidden"
           onChange={handleImport}
+        />
+        <input
+          ref={linkedinInputRef}
+          type="file"
+          accept=".zip"
+          className="hidden"
+          onChange={handleLinkedInImport}
         />
 
         <Button
