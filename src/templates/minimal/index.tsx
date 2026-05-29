@@ -36,7 +36,7 @@ function makeStyles(accentColor: string, fontSize: ResumeMeta['fontSize']) {
       textAlign: 'center',
       color: accentColor,
       fontFamily: 'Helvetica',
-      marginBottom: 4 * s,
+      marginBottom: 10 * s,
     },
     contactRow: {
       fontSize: 8.5 * s,

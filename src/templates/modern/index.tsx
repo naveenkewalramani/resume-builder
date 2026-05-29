@@ -50,7 +50,7 @@ function makeStyles(accentColor: string, fontSize: ResumeMeta['fontSize']) {
       fontSize: 18 * s,
       color: '#ffffff',
       fontFamily: 'Helvetica-Bold',
-      marginBottom: 6 * s,
+      marginBottom: 12 * s,
     },
     leftContactItem: {
       fontSize: 8 * s,

@@ -38,7 +38,7 @@ function makeStyles(accentColor: string, fontSize: ResumeMeta['fontSize']) {
       textAlign: 'center',
       textTransform: 'uppercase',
       letterSpacing: 2,
-      marginBottom: 4,
+      marginBottom: 10,
     },
     contactRow: {
       fontFamily: 'Times-Roman',
