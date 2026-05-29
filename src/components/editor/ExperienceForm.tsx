@@ -118,7 +118,7 @@ export function ExperienceForm() {
                 placeholder="Acme Corp"
               />
             </div>
-            <div className="space-y-1">
+            <div className="space-y-1 col-span-2">
               <Label>Location</Label>
               <Input
                 value={exp.location}
@@ -139,12 +139,12 @@ export function ExperienceForm() {
               <Input
                 value={exp.endDate ?? ''}
                 onChange={(e) => updateExperience(exp.id, { endDate: e.target.value || null })}
-                placeholder="YYYY-MM or leave empty if current"
+                placeholder="YYYY-MM"
                 disabled={exp.current}
               />
             </div>
-            <div className="space-y-1 flex items-end">
-              <label className="flex items-center gap-2 text-sm cursor-pointer">
+            <div className="col-span-2">
+              <label className="flex items-center gap-2 text-sm cursor-pointer py-1">
                 <input
                   type="checkbox"
                   checked={exp.current}

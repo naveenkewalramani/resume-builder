@@ -12,7 +12,7 @@ export function PersonalForm() {
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-2 gap-3">
-        <div className="space-y-1">
+        <div className="space-y-1 col-span-2">
           <Label>Full Name</Label>
           <Input
             value={p.fullName}
@@ -37,7 +37,7 @@ export function PersonalForm() {
             placeholder="+1 (555) 000-0000"
           />
         </div>
-        <div className="space-y-1">
+        <div className="space-y-1 col-span-2">
           <Label>Location</Label>
           <Input
             value={p.location}
@@ -45,7 +45,7 @@ export function PersonalForm() {
             placeholder="San Francisco, CA"
           />
         </div>
-        <div className="space-y-1">
+        <div className="space-y-1 col-span-2">
           <Label>LinkedIn</Label>
           <Input
             value={p.linkedin ?? ''}
@@ -53,7 +53,7 @@ export function PersonalForm() {
             placeholder="linkedin.com/in/yourname"
           />
         </div>
-        <div className="space-y-1">
+        <div className="space-y-1 col-span-2">
           <Label>GitHub</Label>
           <Input
             value={p.github ?? ''}

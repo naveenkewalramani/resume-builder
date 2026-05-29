@@ -56,22 +56,6 @@ export function EducationForm() {
               />
             </div>
             <div className="space-y-1">
-              <Label>Location</Label>
-              <Input
-                value={edu.location}
-                onChange={(e) => updateEducation(edu.id, { location: e.target.value })}
-                placeholder="Berkeley, CA"
-              />
-            </div>
-            <div className="space-y-1">
-              <Label>GPA (optional)</Label>
-              <Input
-                value={edu.gpa ?? ''}
-                onChange={(e) => updateEducation(edu.id, { gpa: e.target.value })}
-                placeholder="3.8"
-              />
-            </div>
-            <div className="space-y-1">
               <Label>Start Date</Label>
               <Input
                 value={edu.startDate}
@@ -88,8 +72,8 @@ export function EducationForm() {
                 disabled={edu.current}
               />
             </div>
-            <div className="flex items-end">
-              <label className="flex items-center gap-2 text-sm cursor-pointer">
+            <div className="col-span-2">
+              <label className="flex items-center gap-2 text-sm cursor-pointer py-1">
                 <input
                   type="checkbox"
                   checked={edu.current}
@@ -100,6 +84,22 @@ export function EducationForm() {
                 />
                 Currently studying
               </label>
+            </div>
+            <div className="space-y-1">
+              <Label>Location</Label>
+              <Input
+                value={edu.location}
+                onChange={(e) => updateEducation(edu.id, { location: e.target.value })}
+                placeholder="Berkeley, CA"
+              />
+            </div>
+            <div className="space-y-1">
+              <Label>GPA (optional)</Label>
+              <Input
+                value={edu.gpa ?? ''}
+                onChange={(e) => updateEducation(edu.id, { gpa: e.target.value })}
+                placeholder="3.8"
+              />
             </div>
           </div>
         </div>

@@ -222,7 +222,7 @@ export function EditorPanel() {
   return (
     <div className="flex h-full border-r bg-background">
       {/* Left sidebar */}
-      <div className="w-[220px] shrink-0 flex flex-col border-r bg-muted/30">
+      <div className="w-[180px] shrink-0 flex flex-col border-r bg-muted/30">
         <div className="px-4 py-3 border-b">
           <h2 className="font-semibold text-sm">Resume Editor</h2>
         </div>
@@ -374,7 +374,7 @@ export function EditorPanel() {
       {/* Panel content */}
       <div className="flex-1 min-w-0 flex flex-col">
         <ScrollArea className="flex-1">
-          <div className="px-4 py-4">
+          <div className="px-3 py-4">
             {activePanel === 'personal' && <PersonalForm />}
             {activePanel === 'experience' && <ExperienceForm />}
             {activePanel === 'education' && <EducationForm />}
